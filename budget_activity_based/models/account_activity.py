@@ -66,8 +66,8 @@ class AccountActivity(models.Model):
         result = []
         for activity in self:
             result.append(
-                (activity.id,
-                 "%s / %s" % (activity.activity_group_id.name or '-',
+                (activity.id, "%s / %s" %
+                 (activity.activity_group_id.name or '-',
                               activity.name or '-')))
         return result
 
