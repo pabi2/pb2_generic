@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-import time
 from openerp.report import report_sxw
-from datetime import date,time
 import datetime
 from openerp.osv import osv
+
 
 class VatReportParser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context={}):
@@ -27,16 +26,16 @@ class VatReportParser(report_sxw.rml_parse):
             base_total += r['base_amount']
             tax_total += r['tax_amount']
         return {'base_total': base_total, 'tax_total': tax_total}
-    
+
     def get_lines(self, data):
         period = data.period_id
         company = data.company_id
         tax = data.tax_id
         base_code = data.base_code_id
         tax_code = data.tax_code_id
-        
-        self.cr.execute(""" 
-            SELECT 
+
+        self.cr.execute("""
+            SELECT
                 avt.id,
                 SUM(avt.base_amount) as base_amount,
                 SUM(avt.amount) as tax_amount,
@@ -59,7 +58,7 @@ class VatReportParser(report_sxw.rml_parse):
                 avt.company_id =%s
             GROUP BY
                 avt.id,voucher.date,voucher.number,p.name,p.vat,avt.tax_id
-        """, (tax.id,base_code.id,tax_code.id,period.id,company.id))
+        """, (tax.id, base_code.id, tax_code.id, period.id, company.id))
 
         result = self.cr.dictfetchall()
         return result
@@ -72,4 +71,3 @@ class VatReportAbstarct(osv.AbstractModel):
     _wrapped_report_class = VatReportParser
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

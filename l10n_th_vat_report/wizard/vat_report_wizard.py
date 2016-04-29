@@ -8,8 +8,7 @@ class AccountVatReport(models.TransientModel):
         'res.company',
         string='Company',
         required=True,
-        default=lambda self: self.env['res.company'].\
-        _company_default_get('account.vat.report'),
+        default=lambda self: self.env.user.company_id,
     )
     period_id = fields.Many2one(
         'account.period',
