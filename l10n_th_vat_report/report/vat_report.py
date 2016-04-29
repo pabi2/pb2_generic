@@ -5,7 +5,7 @@ from openerp.osv import osv
 
 
 class VatReportParser(report_sxw.rml_parse):
-    def __init__(self, cr, uid, name, context={}):
+    def __init__(self, cr, uid, name, context):
         super(VatReportParser, self).__init__(cr, uid, name, context=context)
         self.localcontext.update({
             'get_lines': self.get_lines,
