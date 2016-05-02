@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from openerp.report import report_sxw
-import datetime
 from openerp.osv import osv
 
 
