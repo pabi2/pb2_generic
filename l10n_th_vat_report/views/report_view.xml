@@ -25,7 +25,7 @@
                             </div>
                             <div class="col-xs-5 " >
                                 <span><b>Calender Year: &amp;nbsp;</b></span>
-                                <span><t t-esc="get_year(o.period_id)"/></span>
+                                <span><t t-esc="o.period_id.fiscalyear_id.name"/></span>
                             </div>
                         </div>
                         <div class="row mt16 mb16">
@@ -33,7 +33,7 @@
                                 <span><b>Company:</b></span>
                             </div>
                             <div class="col-xs-4" style="border-bottom: 1px solid black;">
-                                <span><t t-esc="o.company_id.name"/></span>
+                                <span><t t-esc="o.company_id.name and o.company_id.name or ''"/></span>
                             </div>
                             <div class="col-xs-1 " >
                                 <span></span>
@@ -42,7 +42,12 @@
                                 <span><b>Tax ID:</b></span>
                             </div>
                             <div class="col-xs-3" style="border-bottom: 1px solid black;">
-                                <span><t t-esc="o.company_id.vat"/></span>
+                                <t t-if="o.company_id.vat">
+                                    <span><t t-esc="o.company_id.vat"/></span>
+                                </t>
+                                <t t-if="not o.company_id.vat">
+                                    <span>&amp;nbsp;</span>
+                                </t>
                             </div>
                         </div>
                         <div class="row mt16 mb16">
@@ -64,15 +69,19 @@
                         </div>
                         <div class="row mt32 mb16">
                             <table class="table table-bordered">
-                                <thead>
-                                    <th class="text-center">#</th>
-                                    <th class="text-center">Date</th>
-                                    <th class="text-center">No.</th>
-                                    <th class="text-center">Customer/Supplier Name</th>
-                                    <th class="text-center">Tax ID</th>
-                                    <th class="text-center">Base Amount</th>
-                                    <th class="text-center">Tax Amount</th>
-                                </thead>
+                                <tr>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">#</th>
+                                    <th class="text-center"  colspan="2" >Tax Invoice</th>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">Customer/Supplier Name</th>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">Tax ID</th>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">Branch ID</th>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">Base Amount</th>
+                                    <th class="text-center" rowspan="2" style="vertical-align: middle;">Tax Amount</th>
+                                </tr>
+                                <tr>
+                                    <th class="text-center" >Date</th>
+                                    <th class="text-center" >No.</th>
+                                </tr>
                                 <tbody>
                                     <t t-foreach="get_lines(o)" t-as="line">
                                         <tr>
@@ -81,6 +90,7 @@
                                             <td><span t-esc="line['number']"/></td>
                                             <td><span t-esc="line['partner_name']"/></td>
                                             <td><span t-esc="line['tax_id']"/></td>
+                                            <td><span/></td>
                                             <td class="text-right"><span t-esc="line['base_amount']"/></td>
                                             <td class="text-right"><span t-esc="line['tax_amount']"/></td>
                                         </tr>
@@ -88,9 +98,9 @@
                                 </tbody>
                                 <tr>
                                     <t t-set="total" t-value="get_base_total(o)"/>
-                                    <td colspan="5" class="text-right"><strong>Total</strong></td>
-                                    <td class="text-right"><span t-esc="total['base_total']"/></td>
-                                    <td class="text-right"><span t-esc="total['tax_total']"/></td>
+                                    <td colspan="6" class="text-right"><strong>Total</strong></td>
+                                    <td class="text-right"><strong t-esc="total['base_total']"/></td>
+                                    <td class="text-right"><strong t-esc="total['tax_total']"/></td>
                                 </tr>
                             </table>
                         </div>
