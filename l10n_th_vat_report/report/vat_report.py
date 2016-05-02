@@ -16,11 +16,17 @@ class VatReportParser(report_sxw.rml_parse):
 
     def get_base_total(self):
         return self.total_base
-    
+
     def get_tax_total(self):
         return self.total_tax
 
     def get_voucher_tax(self, record):
+        """Prepare the report data from account_voucher_tax
+            base on selected tax, tax code, base code,
+            company and period on wizard.
+            :param recordset record: record of current wizard
+            :return: list of dict of value to print report
+        """
         period = record.period_id
         company = record.company_id
         tax = record.tax_id
@@ -56,6 +62,12 @@ class VatReportParser(report_sxw.rml_parse):
         return voucher_tax
 
     def get_invoice_tax(self, record):
+        """Prepare the report data from account_invoice_tax
+            base on selected tax code, base code,
+            company and period on wizard.
+            :param recordset record: record of current wizard
+            :return: list of dict of value to print report
+        """
         period = record.period_id
         company = record.company_id
         base_code = record.base_code_id
