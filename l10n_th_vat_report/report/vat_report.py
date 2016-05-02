@@ -9,16 +9,16 @@ class VatReportParser(report_sxw.rml_parse):
         self.localcontext.update({
             'get_lines': self.get_lines,
             'get_base_total': self.get_base_total,
+            'get_tax_total': self.get_tax_total
         })
+        self.total_tax = 0.0
+        self.total_base = 0.0
 
-    def get_base_total(self, data):
-        res = self.get_lines(data)
-        base_total = 0.0
-        tax_total = 0.0
-        for r in res:
-            base_total += r['base_amount']
-            tax_total += r['tax_amount']
-        return {'base_total': base_total, 'tax_total': tax_total}
+    def get_base_total(self):
+        return self.total_base
+    
+    def get_tax_total(self):
+        return self.total_tax
 
     def get_voucher_tax(self, record):
         period = record.period_id
@@ -93,6 +93,8 @@ class VatReportParser(report_sxw.rml_parse):
         result.extend(voucher_tax)
         invoice_tax = self.get_invoice_tax(record)
         result.extend(invoice_tax)
+        self.total_tax = sum(res['tax_amount'] for res in result)
+        self.total_base = sum(res['base_amount'] for res in result)
         return result
 
 

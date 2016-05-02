@@ -97,10 +97,9 @@
                                     </t>
                                 </tbody>
                                 <tr>
-                                    <t t-set="total" t-value="get_base_total(o)"/>
                                     <td colspan="6" class="text-right"><strong>Total</strong></td>
-                                    <td class="text-right"><strong t-esc="total['base_total']"/></td>
-                                    <td class="text-right"><strong t-esc="total['tax_total']"/></td>
+                                    <td class="text-right"><strong t-esc="get_base_total()"/></td>
+                                    <td class="text-right"><strong t-esc="get_tax_total()"/></td>
                                 </tr>
                             </table>
                         </div>
