@@ -25,7 +25,7 @@ class VatReportParser(report_sxw.rml_parse):
             base on selected tax, tax code, base code,
             company and period on wizard.
             :param recordset record: record of current wizard
-            :return: list of dict of value to print report
+            :return: list of dictionary of value to print report
         """
         period = record.period_id
         company = record.company_id
@@ -66,7 +66,7 @@ class VatReportParser(report_sxw.rml_parse):
             base on selected tax code, base code,
             company and period on wizard.
             :param recordset record: record of current wizard
-            :return: list of dict of value to print report
+            :return: list of dictionary of value to print report
         """
         period = record.period_id
         company = record.company_id
