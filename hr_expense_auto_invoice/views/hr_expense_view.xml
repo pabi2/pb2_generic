@@ -19,6 +19,13 @@
 	    	</field>
             <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
+                
+            </xpath>
+            <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="after">
+                <button name="%(action_expense_line_tax_info)d"
+                        type="action"
+                        string="Add Vat Info"
+                        icon="gtk-ok"/>
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/form/group//field[@name="date_value"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
@@ -26,6 +33,19 @@
             <xpath expr='/form/sheet/notebook/page[@string="Accounting"]/group/group/field[@name="account_move_id"]' position="before">
                 <field name="invoice_id" />
                 <field name="date_invoice" />
+            </xpath>
+            <xpath expr="//page[2]" position="after">
+                <page string="VAT Info">
+                    <field name="vat_expense_line_ids">
+                        <tree string="Vat Info" editable="bottom">
+                            <field name="date_invoice"/> 
+                            <field name="invoice_number"/>
+                            <field name="supplier_name"/>
+                            <field name="supplier_vat"/>
+                            <field name="supplier_taxbranch"/>
+                        </tree>
+                    </field>
+                </page>
             </xpath>
 	    </field>
 	</record>

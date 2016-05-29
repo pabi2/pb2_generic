@@ -46,6 +46,11 @@ class HRExpenseExpese(models.Model):
         copy=False,
         ondelete='set null',
     )
+    vat_expense_line_ids = fields.One2many(
+        'hr.expense.line',
+        'expense_id',
+        string="Vat Info"
+    )
 
     @api.model
     def _prepare_inv_line(self, account_id, exp_line):
@@ -56,6 +61,11 @@ class HRExpenseExpese(models.Model):
             'quantity': exp_line.unit_quantity,
             'product_id': exp_line.product_id.id or False,
             'invoice_line_tax_id': [(6, 0, [x.id for x in exp_line.tax_ids])],
+            'date_invoice': exp_line.date_invoice or False,
+            'invoice_number': exp_line.invoice_number,
+            'supplier_name': exp_line.supplier_name,
+            'supplier_vat': exp_line.supplier_vat,
+            'supplier_taxbranch': exp_line.supplier_taxbranch,
         }
 
     @api.model
@@ -104,6 +114,7 @@ class HRExpenseExpese(models.Model):
             'company_id': expense.company_id.id,
             'currency_id': expense.currency_id.id,
             'journal_id': journal_id,
+            'pay_to': expense.pay_to,
         }
 
     @api.model
@@ -156,9 +167,10 @@ class HRExpenseExpese(models.Model):
             if not expense.invoice_id:
                 invoice = expense._create_supplier_invoice_from_expense()
                 expense.invoice_id = invoice
-                invoice.signal_workflow('invoice_open')
-            expense.write({'account_move_id': expense.invoice_id.move_id.id,
-                           'state': 'done'})
+                # invoice.signal_workflow('invoice_open')
+            # expense.write({'account_move_id': expense.invoice_id.move_id.id,
+                           # 'state': 'done'})
+            expense.write({'state': 'done'})
         return True
 
 
@@ -180,6 +192,11 @@ class HRExpenseLine(models.Model):
         readonly=True,
         compute='_compute_price',
     )
+    date_invoice = fields.Date('Date')
+    invoice_number = fields.Char('Number')
+    supplier_name = fields.Char('Supplier')
+    supplier_vat = fields.Char('Tax ID')
+    supplier_taxbranch = fields.Char('Branch No.')
 
     @api.one
     @api.depends('unit_amount', 'unit_quantity', 'tax_ids', 'product_id',

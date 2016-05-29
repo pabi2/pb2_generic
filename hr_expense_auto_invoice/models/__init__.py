@@ -5,3 +5,4 @@
 from . import hr_expense
 from . import hr_expense_old_api
 from . import account_invoice
+from . import account_tax
