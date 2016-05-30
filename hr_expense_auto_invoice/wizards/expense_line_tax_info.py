@@ -2,6 +2,7 @@
 # © 2016 Kitti U.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from datetime import date
 from openerp import api, models, fields
 
 
@@ -40,11 +41,14 @@ class ExpenseLineTaxInfo(models.TransientModel):
         active_model = context.get('active_model')
         active_id = context.get('active_id')
         expense_line = self.env[active_model].browse(active_id)
+        date_invoice = date.today().strftime('%Y-%m-%d')
+        if expense_line.date_invoice:
+            date_invoice = expense_line.date_invoice
         rec.update({
             'invoice_number': expense_line.invoice_number,
             'supplier_name': expense_line.supplier_name,
             'supplier_vat': expense_line.supplier_vat,
             'supplier_taxbranch': expense_line.supplier_taxbranch,
-            'date_invoice': expense_line.date_invoice
+            'date_invoice': date_invoice,
         })
         return rec

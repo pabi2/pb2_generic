@@ -48,6 +48,9 @@ This Module Features
         "hr_expense",
         "hr_expense_sequence",
         'l10n_th_account',
+        'account_invoice_check_tax_lines_hook',
+        'account_invoice_tax_compute_hook',
+        'account_voucher_tax_compute_one_tax_grouped_hook',
     ],
     "data": [
         "wizards/expense_create_supplier_invoice_wizard.xml",

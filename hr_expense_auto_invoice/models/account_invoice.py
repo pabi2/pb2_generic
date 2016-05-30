@@ -4,7 +4,6 @@
 
 from openerp import models, api, fields, _
 from openerp.exceptions import except_orm
-from openerp.tools import float_compare
 
 
 class AccountInvoice(models.Model):
@@ -63,43 +62,18 @@ class AccountInvoice(models.Model):
             expense.signal_workflow('refuse_to_done')
         return super(AccountInvoice, self).invoice_validate()
 
-    @api.multi
-    def check_tax_lines(self, compute_taxes):
+    @api.model
+    def get_tax_key(self, tax_id):
+        tax = self.env['account.invoice.tax'].browse(tax_id)
         if self.type not in ('in_invoice', 'in_refund') or\
                 self.pay_to != 'employee':
-            return super(AccountInvoice, self).check_tax_lines(compute_taxes)
-        account_invoice_tax = self.env['account.invoice.tax']
-        company_currency = self.company_id.currency_id
-        if not self.tax_line:
-            for tax in compute_taxes.values():
-                account_invoice_tax.create(tax)
-        else:
-            tax_key = []
-            precision = self.env['decimal.precision'].precision_get('Account')
-            for tax in self.tax_line:
-                if tax.manual:
-                    continue
-                # TODO: create hook method
-                key = (tax.tax_code_id.id, tax.base_code_id.id,
-                       tax.account_id.id, tax.invoice_number,
-                       tax.expense_partner_id.id)
-                tax_key.append(key)
-                if key not in compute_taxes:
-                    raise except_orm(_('Warning!'),
-                                     _('Global taxes defined,\
-                                    but they are not in invoice lines !'))
-                base = compute_taxes[key]['base']
-                if float_compare(abs(base - tax.base),
-                                 company_currency.rounding,
-                                 precision_digits=precision) == 1:
-                    raise except_orm(_('Warning!'),
-                                     _('Tax base different!\nClick \
-                                     on compute to update the tax base.'))
-            for key in compute_taxes:
-                if key not in tax_key:
-                    raise except_orm(_('Warning!'),
-                                     _('Taxes are missing!\nClick on\
-                                     compute button.'))
+            return super(AccountInvoice, self).get_tax_key(tax_id)
+        key = (tax.tax_code_id.id,
+               tax.base_code_id.id,
+               tax.account_id.id,
+               tax.invoice_number,
+               tax.expense_partner_id.id)
+        return key
 
 
 class AccountInvoiceLine(models.Model):
