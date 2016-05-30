@@ -155,8 +155,7 @@ class HRExpenseExpese(models.Model):
             inv_line = InvoiceLine.create(inv_line_data)
             inv_lines.append(inv_line.id)
         if line_total != expense.amount:
-            raise UserError(
-                    _('Expense amount is mismatched.'))
+            raise UserError(_('Expense amount is mismatched.'))
         invoice_vals.update({'invoice_line': [(6, 0, inv_lines)]})
         # Create Invoice
         invoice = Invoice.create(invoice_vals)
