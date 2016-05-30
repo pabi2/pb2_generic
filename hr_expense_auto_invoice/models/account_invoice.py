@@ -22,7 +22,7 @@ class AccountInvoice(models.Model):
         [('employee', 'Employee'),
          ('supplier', 'Supplier')],
         string='Pay to',
-#         default='supplier',
+        default='supplier',
         readonly=True,
     )
 
@@ -45,7 +45,8 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_validate(self):
         for invoice in self:
-            if invoice.type in ('in_invoice', 'in_refund') and invoice.pay_to == 'employee':
+            if invoice.type in ('in_invoice', 'in_refund') and\
+                    invoice.pay_to == 'employee':
                 for tax in invoice.tax_line:
                     if not tax.expense_partner_id:
                         raise except_orm(
@@ -64,13 +65,11 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def check_tax_lines(self, compute_taxes):
-        
-        if self.type not in ('in_invoice', 'in_refund') or  self.pay_to != 'employee':
+        if self.type not in ('in_invoice', 'in_refund') or\
+                self.pay_to != 'employee':
             return super(AccountInvoice, self).check_tax_lines(compute_taxes)
-        
         account_invoice_tax = self.env['account.invoice.tax']
         company_currency = self.company_id.currency_id
-        
         if not self.tax_line:
             for tax in compute_taxes.values():
                 account_invoice_tax.create(tax)
@@ -81,17 +80,27 @@ class AccountInvoice(models.Model):
                 if tax.manual:
                     continue
                 # TODO: create hook method
-                key = (tax.tax_code_id.id, tax.base_code_id.id, tax.account_id.id,
-                       tax.invoice_number,tax.expense_partner_id.id)
+                key = (tax.tax_code_id.id, tax.base_code_id.id,
+                       tax.account_id.id, tax.invoice_number,
+                       tax.expense_partner_id.id)
                 tax_key.append(key)
                 if key not in compute_taxes:
-                    raise except_orm(_('Warning!'), _('Global taxes defined, but they are not in invoice lines !'))
+                    raise except_orm(_('Warning!'),
+                                     _('Global taxes defined,\
+                                    but they are not in invoice lines !'))
                 base = compute_taxes[key]['base']
-                if float_compare(abs(base - tax.base), company_currency.rounding, precision_digits=precision) == 1:
-                    raise except_orm(_('Warning!'), _('Tax base different!\nClick on compute to update the tax base.'))
+                if float_compare(abs(base - tax.base),
+                                 company_currency.rounding,
+                                 precision_digits=precision) == 1:
+                    raise except_orm(_('Warning!'),
+                                     _('Tax base different!\nClick \
+                                     on compute to update the tax base.'))
             for key in compute_taxes:
                 if key not in tax_key:
-                    raise except_orm(_('Warning!'), _('Taxes are missing!\nClick on compute button.'))
+                    raise except_orm(_('Warning!'),
+                                     _('Taxes are missing!\nClick on\
+                                     compute button.'))
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"

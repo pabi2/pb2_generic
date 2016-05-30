@@ -66,8 +66,10 @@ class VatReportParser(report_sxw.rml_parse):
                 p.name,p.vat,avt.tax_id,p.taxbranch
         """, (tax.id, base_code.id, tax_code.id, period.id, company.id))
         voucher_tax = self.cr.dictfetchall()
-        expense_partner_list = [d for d in voucher_tax if d['expense_partner_id']]
-        none_expense_partner_list = [d for d in voucher_tax if not d['expense_partner_id']]
+        expense_partner_list =\
+            [d for d in voucher_tax if d['expense_partner_id']]
+        none_expense_partner_list =\
+            [d for d in voucher_tax if not d['expense_partner_id']]
         for rec in voucher_tax:
             inv_tax = self.pool.get('account.voucher.tax').\
                 browse(self.cr, self.uid, rec['id'])
@@ -126,8 +128,10 @@ class VatReportParser(report_sxw.rml_parse):
                 ait.expense_partner_id
         """, (base_code.id, tax_code.id, period.id, company.id))
         invoice_tax = self.cr.dictfetchall()
-        expense_partner_list = [d for d in invoice_tax if d['expense_partner_id']]
-        none_expense_partner_list = [d for d in invoice_tax if not d['expense_partner_id']]
+        expense_partner_list =\
+            [d for d in invoice_tax if d['expense_partner_id']]
+        none_expense_partner_list =\
+            [d for d in invoice_tax if not d['expense_partner_id']]
         for rec in expense_partner_list:
             inv_tax = self.pool.get('account.invoice.tax').\
                 browse(self.cr, self.uid, rec['id'])

@@ -173,8 +173,9 @@ class HRExpenseExpese(models.Model):
                 invoice = expense._create_supplier_invoice_from_expense()
                 expense.invoice_id = invoice
                 # invoice.signal_workflow('invoice_open')
-            # expense.write({'account_move_id': expense.invoice_id.move_id.id,
-                           # 'state': 'done'})
+                # expense.write({'account_move_id':
+                # expense.invoice_id.move_id.id,
+                # 'state': 'done'})
             expense.write({'state': 'done'})
         return True
 
