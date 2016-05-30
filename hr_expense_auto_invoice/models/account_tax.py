@@ -38,9 +38,9 @@ class AccountInvoiceTax(models.Model):
                     'sequence': tax['sequence'],
                     'base': currency.round(tax['price_unit'] 
                                            * line['quantity']),
-                    'invoice_number': line.invoice_number,#probuse
+                    'invoice_number': line.invoice_number,
                     'expense_partner_id': line.expense_partner_id and\
-                        line.expense_partner_id.id or False, #probuse
+                        line.expense_partner_id.id or False,
                 }
                 if invoice.type in ('out_invoice','in_invoice'):
                     val['base_code_id'] = tax['base_code_id']
@@ -78,8 +78,8 @@ class AccountInvoiceTax(models.Model):
                     val['account_id'] == line.account_id.id:
                     val['account_analytic_id'] = line.account_analytic_id.id
                 key = (val['tax_code_id'], val['base_code_id'],
-                       val['account_id'], val['invoice_number'],#probuse
-                       val['expense_partner_id'])#probuse
+                       val['account_id'], val['invoice_number'],
+                       val['expense_partner_id'])
                 if not key in tax_grouped:
                     tax_grouped[key] = val
                 else:
@@ -87,7 +87,6 @@ class AccountInvoiceTax(models.Model):
                     tax_grouped[key]['amount'] += val['amount']
                     tax_grouped[key]['base_amount'] += val['base_amount']
                     tax_grouped[key]['tax_amount'] += val['tax_amount']
-        
         for t in tax_grouped.values():
             t['base'] = currency.round(t['base'])
             t['amount'] = currency.round(t['amount'])
@@ -101,14 +100,13 @@ class AccountVoucherTax(models.Model):
 
     expense_partner_id = fields.Many2one('res.partner', 'Supplier')
     invoice_number = fields.Char('Document')
-    
-    
+
     @api.model
     def _compute_one_tax_grouped(self, taxes, voucher, voucher_cur,
                                  invoice, invoice_cur, company_currency,
                                  journal, line_sign, payment_ratio,
                                  line, revised_price):
-        
+
         if invoice.pay_to != 'employee' or\
             invoice.type not in ('in_invoice', 'in_refund'):
             return super(AccountVoucherTax, self)._compute_one_tax_grouped(
@@ -122,8 +120,8 @@ class AccountVoucherTax(models.Model):
             val = {}
             val['voucher_id'] = voucher.id
             val['invoice_id'] = invoice.id
-            val['invoice_number'] = line.invoice_number#probuse
-            val['expense_partner_id'] = line.expense_partner_id.id#probuse
+            val['invoice_number'] = line.invoice_number
+            val['expense_partner_id'] = line.expense_partner_id.id
             val['tax_id'] = tax['id']
             val['name'] = tax['name']
             val['amount'] = self._to_voucher_currency(
@@ -142,8 +140,8 @@ class AccountVoucherTax(models.Model):
             vals = {}
             vals['voucher_id'] = voucher.id
             vals['invoice_id'] = invoice.id
-            vals['invoice_number'] = line.invoice_number#probuse
-            vals['expense_partner_id'] = line.expense_partner_id.id#probuse
+            vals['invoice_number'] = line.invoice_number
+            vals['expense_partner_id'] = line.expense_partner_id.id
             vals['tax_id'] = tax['id']
             vals['name'] = tax['name']
             vals['amount'] = self._to_invoice_currency(
@@ -216,7 +214,7 @@ class AccountVoucherTax(models.Model):
 
                 key = (val['invoice_id'], val['tax_code_id'],
                        val['base_code_id'], val['account_id'],
-                       val['invoice_number'], val['expense_partner_id'])#probuse
+                       val['invoice_number'], val['expense_partner_id'])
                 if not (key in tax_gp):
                     tax_gp[key] = val
                     tax_gp[key]['amount'] = tax_gp[key]['amount']
@@ -279,7 +277,7 @@ class AccountVoucherTax(models.Model):
 
                 key = (val['invoice_id'], val['tax_code_id'],
                        val['base_code_id'], val['account_id'],
-                       val['invoice_number'], val['expense_partner_id'])#probuse
+                       val['invoice_number'], val['expense_partner_id'])
                 if not (key in tax_gp):
                     tax_gp[key] = val
                 else:
@@ -333,7 +331,7 @@ class AccountVoucherTax(models.Model):
 
                 key = (vals['invoice_id'], vals['tax_code_id'],
                        vals['base_code_id'], vals['account_id'],
-                       vals['invoice_number'], vals['expense_partner_id'])#probuse
+                       vals['invoice_number'], vals['expense_partner_id'])
                 if not (key in tax_gp):
                     tax_gp[key] = vals
                 else:

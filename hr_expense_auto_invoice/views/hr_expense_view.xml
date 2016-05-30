@@ -19,13 +19,16 @@
 	    	</field>
             <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
-                
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="after">
                 <button name="%(action_expense_line_tax_info)d"
                         type="action"
                         string="Add Vat Info"
                         icon="gtk-ok"/>
+            </xpath>
+            <xpath expr="//button[@name='action_view_move']" position="attributes">
+                <attribute name="states"></attribute>
+                <attribute name="attrs">{'invisible': ['|',('account_move_id', '=', False), ('state', '!=', 'done')]}</attribute>
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/form/group//field[@name="date_value"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />

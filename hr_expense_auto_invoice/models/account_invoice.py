@@ -22,6 +22,7 @@ class AccountInvoice(models.Model):
         [('employee', 'Employee'),
          ('supplier', 'Supplier')],
         string='Pay to',
+#         default='supplier',
         readonly=True,
     )
 

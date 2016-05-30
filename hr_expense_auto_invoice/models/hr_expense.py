@@ -146,12 +146,17 @@ class HRExpenseExpese(models.Model):
         InvoiceLine = self.env['account.invoice.line']
         expense = self
         invoice_vals = expense._prepare_inv(expense)
+        line_total = 0
         for exp_line in expense.line_ids:
             account_id = self._choose_account_from_exp_line(
                 exp_line, invoice_vals['fiscal_position'])
+            line_total += exp_line.total_amount
             inv_line_data = self._prepare_inv_line(account_id, exp_line)
             inv_line = InvoiceLine.create(inv_line_data)
             inv_lines.append(inv_line.id)
+        if line_total != expense.amount:
+            raise UserError(
+                    _('Expense amount is mismatched.'))
         invoice_vals.update({'invoice_line': [(6, 0, inv_lines)]})
         # Create Invoice
         invoice = Invoice.create(invoice_vals)

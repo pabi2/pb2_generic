@@ -8,7 +8,11 @@ from openerp import api, models, fields
 class ExpenseLineTaxInfo(models.TransientModel):
     _name = "expense.line.tax.info"
 
-    date_invoice = fields.Date('Date', required=True, default=fields.Date.today(), )
+    date_invoice = fields.Date(
+        'Date',
+        required=True,
+        default=fields.Date.today(),
+    )
     invoice_number = fields.Char('Number', required=True, )
     supplier_name = fields.Char('Supplier', required=True, )
     supplier_vat = fields.Char('Tax ID', required=True, )
@@ -28,3 +32,19 @@ class ExpenseLineTaxInfo(models.TransientModel):
                     'supplier_taxbranch': record.supplier_taxbranch,
                 })
         return True
+
+    @api.model
+    def default_get(self, fields):
+        rec = super(ExpenseLineTaxInfo, self).default_get(fields)
+        context = dict(self._context or {})
+        active_model = context.get('active_model')
+        active_id = context.get('active_id')
+        expense_line = self.env[active_model].browse(active_id)
+        rec.update({
+            'invoice_number': expense_line.invoice_number,
+            'supplier_name': expense_line.supplier_name,
+            'supplier_vat': expense_line.supplier_vat,
+            'supplier_taxbranch': expense_line.supplier_taxbranch,
+            'date_invoice': expense_line.date_invoice
+        })
+        return rec
