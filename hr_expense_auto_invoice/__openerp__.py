@@ -50,7 +50,6 @@ This Module Features
         'l10n_th_account',
         'account_invoice_check_tax_lines_hook',
         'account_invoice_tax_compute_hook',
-        'account_voucher_tax_compute_one_tax_grouped_hook',
     ],
     "data": [
         "wizards/expense_create_supplier_invoice_wizard.xml",
@@ -58,6 +57,6 @@ This Module Features
         "views/hr_expense_view.xml",
         "workflow/hr_expense_workflow.xml",
         'views/invoice_view.xml',
-        'views/voucher_view.xml',
+        # 'views/voucher_view.xml',
     ],
 }
