@@ -11,11 +11,11 @@
             <field name="inherit_id" ref="account.view_partner_property_form"/>
             <field name="arch" type="xml">
                 <field name="property_account_receivable" position="before">
-                	<field name="property_account_retention_customer" groups="account.group_account_invoice" />
-				</field>
+                    <field name="property_account_retention_customer" groups="account.group_account_invoice" />
+                </field>
                 <field name="property_account_payable" position="before">
-                	<field name="property_account_retention_supplier" groups="account.group_account_invoice" />
-				</field>		
+                    <field name="property_account_retention_supplier" groups="account.group_account_invoice" />
+                </field>
             </field>
         </record>
     </data>
