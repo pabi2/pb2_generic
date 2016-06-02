@@ -146,7 +146,7 @@ class HRExpenseExpese(models.Model):
         InvoiceLine = self.env['account.invoice.line']
         expense = self
         invoice_vals = expense._prepare_inv(expense)
-        line_total = 0
+        line_total = 0.0
         for exp_line in expense.line_ids:
             account_id = self._choose_account_from_exp_line(
                 exp_line, invoice_vals['fiscal_position'])
@@ -154,6 +154,7 @@ class HRExpenseExpese(models.Model):
             inv_line_data = self._prepare_inv_line(account_id, exp_line)
             inv_line = InvoiceLine.create(inv_line_data)
             inv_lines.append(inv_line.id)
+            exp_line.write({'invoice_line_ids': [(4, inv_line.id)]})
         if line_total != expense.amount:
             raise UserError(_('Expense amount is mismatched.'))
         invoice_vals.update({'invoice_line': [(6, 0, inv_lines)]})
@@ -171,10 +172,6 @@ class HRExpenseExpese(models.Model):
             if not expense.invoice_id:
                 invoice = expense._create_supplier_invoice_from_expense()
                 expense.invoice_id = invoice
-                # invoice.signal_workflow('invoice_open')
-                # expense.write({'account_move_id':
-                # expense.invoice_id.move_id.id,
-                # 'state': 'done'})
             expense.write({'state': 'done'})
         return True
 
@@ -182,6 +179,34 @@ class HRExpenseExpese(models.Model):
 class HRExpenseLine(models.Model):
     _inherit = "hr.expense.line"
 
+    date_invoice = fields.Date(
+        string='Date',
+    )
+    invoice_number = fields.Char(
+        string='Number',
+    )
+    supplier_name = fields.Char(
+        string='Supplier',
+    )
+    supplier_vat = fields.Char(
+        string='Tax ID',
+    )
+    supplier_taxbranch = fields.Char(
+        string='Branch No.',
+    )
+    expense_state = fields.Selection(
+        [('draft', 'New'),
+         ('cancelled', 'Refused'),
+         ('confirm', 'Waiting Approval'),
+         ('accepted', 'Approved'),
+         ('done', 'Waiting Payment'),
+         ('paid', 'Paid'),
+         ],
+        string='Expense state',
+        readonly=True,
+        related='expense_id.state',
+        store=True,
+    )
     tax_ids = fields.Many2many(
         'account.tax',
         'expense_line_tax_rel',
@@ -197,11 +222,39 @@ class HRExpenseLine(models.Model):
         readonly=True,
         compute='_compute_price',
     )
-    date_invoice = fields.Date('Date')
-    invoice_number = fields.Char('Number')
-    supplier_name = fields.Char('Supplier')
-    supplier_vat = fields.Char('Tax ID')
-    supplier_taxbranch = fields.Char('Branch No.')
+    invoice_line_ids = fields.Many2many(
+        'account.invoice.line',
+        'expense_line_invoice_line_rel',
+        'expense_line_id',
+        'invoice_line_id',
+        readonly=True,
+        copy=False,
+    )
+    invoiced_qty = fields.Float(
+        string='Invoiced Quantity',
+        digits=(12, 6),
+        compute='_compute_invoiced_qty',
+        store=True,
+        copy=False,
+        default=0.0,
+        help="This field calculate invoiced quantity at line level. "
+        "Will be used to calculate committed budget",
+    )
+
+    @api.depends('invoice_line_ids.invoice_id.state')
+    def _compute_invoiced_qty(self):
+        Uom = self.env['product.uom']
+        for expense_line in self:
+            invoiced_qty = 0.0
+            for invoice_line in expense_line.invoice_line_ids:
+                invoice = invoice_line.invoice_id
+                if invoice.state and invoice.state not in ['draft', 'cancel']:
+                    # Invoiced Qty in PO Line's UOM
+                    invoiced_qty += Uom._compute_qty(invoice_line.uos_id.id,
+                                                     invoice_line.quantity,
+                                                     expense_line.uom_id.id)
+            expense_line.invoiced_qty = min(expense_line.unit_quantity,
+                                            invoiced_qty)
 
     @api.one
     @api.depends('unit_amount', 'unit_quantity', 'tax_ids', 'product_id',
