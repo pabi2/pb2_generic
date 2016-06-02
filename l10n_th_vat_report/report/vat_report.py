@@ -66,10 +66,10 @@ class VatReportParser(report_sxw.rml_parse):
                 p.name,p.vat,avt.tax_id,p.taxbranch
         """, (tax.id, base_code.id, tax_code.id, period.id, company.id))
         voucher_tax = self.cr.dictfetchall()
-        expense_partner_list =\
-            [d for d in voucher_tax if d['expense_partner_id']]
-        none_expense_partner_list =\
-            [d for d in voucher_tax if not d['expense_partner_id']]
+#         expense_partner_list =\
+#             [d for d in voucher_tax if d['expense_partner_id']]
+#         none_expense_partner_list =\
+#             [d for d in voucher_tax if not d['expense_partner_id']]
         for rec in voucher_tax:
             inv_tax = self.pool.get('account.voucher.tax').\
                 browse(self.cr, self.uid, rec['id'])
@@ -77,9 +77,13 @@ class VatReportParser(report_sxw.rml_parse):
                 rec['partner_name'] = inv_tax.expense_partner_id.name
                 rec['tax_id'] = inv_tax.expense_partner_id.vat
                 rec['taxbranch'] = inv_tax.expense_partner_id.taxbranch
+            else:
+                rec['partner_name'] = inv_tax.supplier_name
+                rec['tax_id'] = inv_tax.supplier_vat
+                rec['taxbranch'] = inv_tax.supplier_taxbranch
             if inv_tax.invoice_number:
                 rec['number'] = inv_tax.invoice_number
-        voucher_tax = expense_partner_list + none_expense_partner_list
+#         voucher_tax = expense_partner_list + none_expense_partner_list
         return voucher_tax
 
     def get_invoice_tax(self, record):
@@ -128,20 +132,24 @@ class VatReportParser(report_sxw.rml_parse):
                 ait.expense_partner_id
         """, (base_code.id, tax_code.id, period.id, company.id))
         invoice_tax = self.cr.dictfetchall()
-        expense_partner_list =\
-            [d for d in invoice_tax if d['expense_partner_id']]
-        none_expense_partner_list =\
-            [d for d in invoice_tax if not d['expense_partner_id']]
-        for rec in expense_partner_list:
+#         expense_partner_list =\
+#             [d for d in invoice_tax if d['expense_partner_id']]
+#         none_expense_partner_list =\
+#             [d for d in invoice_tax if not d['expense_partner_id']]
+        for rec in invoice_tax:
             inv_tax = self.pool.get('account.invoice.tax').\
                 browse(self.cr, self.uid, rec['id'])
             if inv_tax.expense_partner_id:
                 rec['partner_name'] = inv_tax.expense_partner_id.name
                 rec['tax_id'] = inv_tax.expense_partner_id.vat
                 rec['taxbranch'] = inv_tax.expense_partner_id.taxbranch
+            else:
+                rec['partner_name'] = inv_tax.supplier_name
+                rec['tax_id'] = inv_tax.supplier_vat
+                rec['taxbranch'] = inv_tax.supplier_taxbranch
             if inv_tax.invoice_number:
                 rec['number'] = inv_tax.invoice_number
-        invoice_tax = expense_partner_list + none_expense_partner_list
+#         invoice_tax = expense_partner_list + none_expense_partner_list
         return invoice_tax
 
     def get_lines(self, record):

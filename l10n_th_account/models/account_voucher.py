@@ -706,9 +706,12 @@ class account_voucher_tax(common_voucher, models.Model):
         compute='_count_factor')
     expense_partner_id = fields.Many2one(
         'res.partner',
-        string='Supplier'
+        string='Supplier',
     )
     invoice_number = fields.Char(string='Document')
+    supplier_name = fields.Char('Supplier Name')
+    supplier_vat = fields.Char('Tax ID')
+    supplier_taxbranch = fields.Char('Branch No.')
 
     @api.model
     def _compute_one_tax_grouped(self, taxes, voucher, voucher_cur,
@@ -723,6 +726,9 @@ class account_voucher_tax(common_voucher, models.Model):
             val['voucher_id'] = voucher.id
             val['invoice_id'] = invoice.id
             val['invoice_number'] = line.invoice_number
+            val['supplier_name'] = line.supplier_name
+            val['supplier_vat'] = line.supplier_vat
+            val['supplier_taxbranch'] = line.supplier_taxbranch
             val['expense_partner_id'] = line.expense_partner_id and \
                 line.expense_partner_id.id or False
             val['tax_id'] = tax['id']
@@ -744,6 +750,9 @@ class account_voucher_tax(common_voucher, models.Model):
             vals['voucher_id'] = voucher.id
             vals['invoice_id'] = invoice.id
             vals['invoice_number'] = line.invoice_number
+            vals['supplier_name'] = line.supplier_name
+            vals['supplier_vat'] = line.supplier_vat
+            vals['supplier_taxbranch'] = line.supplier_taxbranch
             vals['expense_partner_id'] = line.expense_partner_id and \
                 line.expense_partner_id.id or False
             vals['tax_id'] = tax['id']

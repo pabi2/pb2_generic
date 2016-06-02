@@ -25,7 +25,8 @@
                     </page>
                 </xpath>
                 <xpath expr="//form/sheet/notebook/page[1]/div[1]/field/tree/field[@name='account_analytic_id']" position="after">
-                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
+                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/> 
+                    <field name="supplier_name"/>
                     <field name="invoice_number"/>
                 </xpath>
             </field>

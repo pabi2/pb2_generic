@@ -10,6 +10,9 @@ class AccountInvoiceTax(models.Model):
 
     expense_partner_id = fields.Many2one('res.partner', 'Supplier')
     invoice_number = fields.Char('Document')
+    supplier_name = fields.Char('Supplier Name')
+    supplier_vat = fields.Char('Tax ID')
+    supplier_taxbranch = fields.Char('Branch No.')
 
     @api.model
     def get_invoice_tax_key(self, val, line_id):
@@ -19,7 +22,10 @@ class AccountInvoiceTax(models.Model):
                 invoice.pay_to == 'employee':
             val.update(invoice_number=line.invoice_number,
                        expense_partner_id=line.expense_partner_id and
-                       line.expense_partner_id.id or False)
+                       line.expense_partner_id.id or False,
+                       supplier_name=line.supplier_name,
+                       supplier_vat=line.supplier_vat,
+                       supplier_taxbranch=line.supplier_taxbranch, )
             key = (val['tax_code_id'],
                    val['base_code_id'],
                    val['account_id'],

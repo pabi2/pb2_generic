@@ -146,7 +146,8 @@
 			                    <tree editable="bottom" string="Taxes">
 			                    	<field name="invoice_id"/>
 			                    	<field name="invoice_number"/>
-                                    <field name="expense_partner_id"/>
+                                    <field name="expense_partner_id"/> 
+                                    <field name="supplier_name"/>
 			                        <field name="name"/>
 			                        <field name="account_id" groups="account.group_account_user"/>
 			                        <field name="base" readonly="1"/>

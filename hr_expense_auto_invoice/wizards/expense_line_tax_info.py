@@ -21,7 +21,7 @@ class ExpenseLineTaxInfo(models.TransientModel):
     expense_partner_id = fields.Many2one(
         'res.partner',
         string='Supplier ID',
-        required=True,
+        required=False,
     )
 
     @api.multi
