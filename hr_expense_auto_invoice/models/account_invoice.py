@@ -43,14 +43,14 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def invoice_validate(self):
-        for invoice in self:
-            if invoice.type in ('in_invoice', 'in_refund') and\
-                    invoice.pay_to == 'employee':
-                for tax in invoice.tax_line:
-                    if not tax.expense_partner_id:
-                        raise except_orm(
-                            _('Warning!'),
-                            _("Please define supplier in tax line."))
+        # for invoice in self:
+            # if invoice.type in ('in_invoice', 'in_refund') and\
+                    # invoice.pay_to == 'employee':
+                # for tax in invoice.tax_line:
+                    # if not tax.expense_partner_id:
+                        # raise except_orm(
+                            # _('Warning!'),
+                            # _("Please define supplier in tax line."))
         expenses = self.env['hr.expense.expense'].search([('invoice_id',
                                                            'in', self._ids)])
         for expense in expenses:

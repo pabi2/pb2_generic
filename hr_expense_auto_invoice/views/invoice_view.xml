@@ -11,13 +11,13 @@
                     <field name="pay_to"/>
                 </xpath>
                 <xpath expr="//form/sheet/notebook/page[3]" position="after">
-                    <page string="Vat Info">
+                    <page string="Vat Info" attrs="{'invisible': [('pay_to', '!=', 'employee')]}">
                         <field name="tax_invoice_line">
-                            <tree string="Vat Info" editable="bottom">
+                            <tree string="Vat Info" editable="bottom" create="false" delete="false">
                                 <field name="date_invoice"/>
                                 <field name="invoice_number"/>
                                 <field name="supplier_name"/>
-                                <field name="expense_partner_id"/>
+                                <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
                                 <field name="supplier_vat"/>
                                 <field name="supplier_taxbranch"/>
                             </tree>
@@ -25,7 +25,7 @@
                     </page>
                 </xpath>
                 <xpath expr="//form/sheet/notebook/page[1]/div[1]/field/tree/field[@name='account_analytic_id']" position="after">
-                    <field name="expense_partner_id"/>
+                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
                     <field name="invoice_number"/>
                 </xpath>
             </field>

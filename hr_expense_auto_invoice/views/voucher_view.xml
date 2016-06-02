@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='tax_line']/tree/field[@name='invoice_id']" position="after">
                     <field name="invoice_number"/>
-                    <field name="expense_partner_id"/>
+                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
                 </xpath>
             </field>
         </record>

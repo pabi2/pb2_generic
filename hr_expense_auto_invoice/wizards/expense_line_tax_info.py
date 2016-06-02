@@ -15,9 +15,14 @@ class ExpenseLineTaxInfo(models.TransientModel):
         default=fields.Date.today(),
     )
     invoice_number = fields.Char('Number', required=True, )
-    supplier_name = fields.Char('Supplier', required=True, )
+    supplier_name = fields.Char('Supplier Text', required=True, )
     supplier_vat = fields.Char('Tax ID', required=True, )
     supplier_taxbranch = fields.Char('Branch No.', required=True, )
+    expense_partner_id = fields.Many2one(
+        'res.partner',
+        string='Supplier ID',
+        required=True,
+    )
 
     @api.multi
     def action_add_tax_info(self):
@@ -31,6 +36,7 @@ class ExpenseLineTaxInfo(models.TransientModel):
                     'supplier_name': record.supplier_name,
                     'supplier_vat': record.supplier_vat,
                     'supplier_taxbranch': record.supplier_taxbranch,
+                    'expense_partner_id': record.expense_partner_id.id,
                 })
         return True
 
@@ -50,5 +56,6 @@ class ExpenseLineTaxInfo(models.TransientModel):
             'supplier_vat': expense_line.supplier_vat,
             'supplier_taxbranch': expense_line.supplier_taxbranch,
             'date_invoice': date_invoice,
+            'expense_partner_id': expense_line.expense_partner_id.id,
         })
         return rec

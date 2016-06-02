@@ -22,14 +22,16 @@
                 <field name="tax_ids" widget="many2many_tags" />
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="after">
+                <field name="pay_to" invisible="1"/>
                 <button name="%(action_expense_line_tax_info)d"
                         type="action"
                         string="Add Vat Info"
-                        icon="gtk-ok"/>
+                        icon="gtk-ok"
+                        attrs="{'invisible': [('pay_to', '!=', 'employee')]}"/>
             </xpath>
             <xpath expr="//button[@name='action_view_move']" position="attributes">
                 <attribute name="states"></attribute>
-                <attribute name="attrs">{'invisible': ['|',('account_move_id', '=', False), ('state', '!=', 'done')]}</attribute>
+                <attribute name="attrs">{'invisible': ['|',('account_move_id', '=', False), ('state', 'not in', ('done', 'paid'))]}</attribute>
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/form/group//field[@name="date_value"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
@@ -38,13 +40,14 @@
                 <field name="invoice_id" />
                 <field name="date_invoice" />
             </xpath>
-            <xpath expr="//page[2]" position="after">
-                <page string="VAT Info">
+            <xpath expr="//page[1]" position="after">
+                <page string="VAT Info" attrs="{'invisible': [('pay_to', '!=', 'employee')]}">
                     <field name="vat_expense_line_ids">
-                        <tree string="Vat Info" editable="bottom">
+                        <tree string="Vat Info" editable="bottom" create="false" delete="false">
                             <field name="date_invoice"/> 
                             <field name="invoice_number"/>
-                            <field name="supplier_name"/>
+                            <field name="supplier_name" string="Supplier Text"/> 
+                            <field name="expense_partner_id" domain="[('supplier', '=', True)]" string="Supplier ID"/>
                             <field name="supplier_vat"/>
                             <field name="supplier_taxbranch"/>
                         </tree>
