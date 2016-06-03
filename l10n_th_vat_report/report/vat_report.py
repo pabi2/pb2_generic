@@ -168,5 +168,3 @@ class VatReportAbstarct(osv.AbstractModel):
     _inherit = "report.abstract_report"
     _template = "l10n_th_vat_report.report_vat"
     _wrapped_report_class = VatReportParser
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
