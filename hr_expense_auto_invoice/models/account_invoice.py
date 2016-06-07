@@ -21,7 +21,7 @@ class AccountInvoice(models.Model):
         [('employee', 'Employee'),
          ('supplier', 'Supplier')],
         string='Pay to',
-        default='supplier',
+        default='employee',
         readonly=True,
     )
 
@@ -79,9 +79,22 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    date_invoice = fields.Date('Date')
-    invoice_number = fields.Char('Document')
-    supplier_name = fields.Char('Supplier Name')
-    supplier_vat = fields.Char('Tax ID')
-    supplier_taxbranch = fields.Char('Branch No.')
-    expense_partner_id = fields.Many2one('res.partner', 'Supplier')
+    date_invoice = fields.Date(
+        string='Date',
+    )
+    invoice_number = fields.Char(
+        string='Document',
+    )
+    supplier_name = fields.Char(
+        string='Supplier Name',
+    )
+    supplier_vat = fields.Char(
+        string='Tax ID',
+    )
+    supplier_taxbranch = fields.Char(
+        string='Branch No.',
+    )
+    expense_partner_id = fields.Many2one(
+        'res.partner',
+        string='Supplier',
+    )

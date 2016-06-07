@@ -13,7 +13,7 @@
                 <xpath expr="//form/sheet/notebook/page[3]" position="after">
                     <page string="Vat Info" attrs="{'invisible': [('pay_to', '!=', 'employee')]}">
                         <field name="tax_invoice_line">
-                            <tree string="Vat Info" editable="bottom" create="false" delete="false">
+                            <tree string="VAT Info" editable="bottom" create="false" delete="false">
                                 <field name="date_invoice"/>
                                 <field name="invoice_number"/>
                                 <field name="supplier_name"/>
@@ -31,5 +31,30 @@
                 </xpath>
             </field>
         </record>
+        
+
+        <record id="view_invoice_line_form" model="ir.ui.view">
+            <field name="name">account.invoice.line.form</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="inside">
+                	
+                    <group string="VAT Info" >
+        
+	                 	<field name="date_invoice"/>
+	                    <field name="invoice_number"/>
+	                    <field name="supplier_name"/>
+	                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
+	                    <field name="supplier_vat"/>
+	                    <field name="supplier_taxbranch"/>
+	                    
+                    </group>
+                    
+                </xpath>
+            </field>
+        </record>
+        
+        
     </data>
 </openerp>

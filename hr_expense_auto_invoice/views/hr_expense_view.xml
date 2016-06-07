@@ -41,7 +41,7 @@
                 <field name="date_invoice" />
             </xpath>
             <xpath expr="//page[1]" position="after">
-                <page string="VAT Info" attrs="{'invisible': [('pay_to', '!=', 'employee')]}">
+                <page string="VAT Info" >
                     <field name="vat_expense_line_ids">
                         <tree string="Vat Info" editable="bottom" create="false" delete="false">
                             <field name="date_invoice"/> 
@@ -56,6 +56,29 @@
             </xpath>
         </field>
     </record>
+    
+        <record id="view_expenses_form_editable_list" model="ir.ui.view">
+            <field name="name">hr.expense.form.editable.list</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='line_ids']/form/group" position="inside">
+                
+                	<group string="VAT Info">
+                	
+                		<field name="date_invoice"/> 
+                        <field name="invoice_number"/>
+                        <field name="supplier_name" string="Supplier Text"/> 
+                        <field name="expense_partner_id" domain="[('supplier', '=', True)]" string="Supplier ID"/>
+                        <field name="supplier_vat"/>
+                        <field name="supplier_taxbranch"/>
+
+                    </group>   
+                                 
+                </xpath>
+            </field>
+        </record>
 
 </data>
 </openerp>
