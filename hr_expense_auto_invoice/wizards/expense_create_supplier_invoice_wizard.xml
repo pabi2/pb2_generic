@@ -11,8 +11,8 @@
     <field name="arch" type="xml">
         <form string="Select invoice date">
             <p>Please select date for supplier invoice</p>
-			<group>            
-            	<field name="date_invoice" />
+            <group>
+                <field name="date_invoice" />
             </group>
             <footer>
                 <button name="action_create_supplier_invoice"

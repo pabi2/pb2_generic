@@ -32,5 +32,7 @@ class hr_expense_expense(osv.osv):
             _amount, string='Total Amount',
             digits_compute=dp.get_precision('Account'),
             store={'hr.expense.line': (_get_expense_from_line,
-                                       ['unit_amount', 'unit_quantity'], 10)}),
+                                       ['unit_amount',
+                                        'unit_quantity',
+                                        'tax_ids'], 10)}),
     }

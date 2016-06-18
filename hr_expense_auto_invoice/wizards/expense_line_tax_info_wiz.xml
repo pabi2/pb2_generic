@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- © 2016 Kitti U.
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+
+<openerp>
+<data>
+
+<record id="wizard_expense_line_tax_info" model="ir.ui.view">
+    <field name="name">Add Tax Info - Expense Line</field>
+    <field name="model">expense.line.tax.info</field>
+    <field name="arch" type="xml">
+        <form string="Tax Info">
+            <p>Tax Information for Supplier Invoice</p>
+            <group>
+                <group>
+                    <field name="invoice_number"/>
+                    <field name="supplier_name"/> 
+                    <field name="expense_partner_id"/>
+                </group>
+                <group>
+                    <field name="date_invoice"/>
+                    <field name="supplier_taxbranch"/> 
+                    <field name="supplier_vat"/>
+                </group>
+            </group>
+            <footer>
+                <button name="action_add_tax_info"
+                        type="object"
+                        string="Add"
+                        class="oe_highlight"/>
+                or
+                <button special="cancel"
+                        class="oe_link"
+                        string="Cancel"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+<record id="action_expense_line_tax_info" model="ir.actions.act_window">
+    <field name="name">Tax Info</field>
+    <field name="res_model">expense.line.tax.info</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">form</field>
+    <field name="context">{}</field>
+    <field name="target">new</field>
+</record>
+
+</data>
+</openerp>

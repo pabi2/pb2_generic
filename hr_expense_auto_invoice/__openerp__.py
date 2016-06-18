@@ -47,10 +47,16 @@ This Module Features
     "depends": [
         "hr_expense",
         "hr_expense_sequence",
+        'l10n_th_account',
+        'account_invoice_check_tax_lines_hook',
+        'account_invoice_tax_compute_hook',
     ],
     "data": [
         "wizards/expense_create_supplier_invoice_wizard.xml",
+        'wizards/expense_line_tax_info_wiz.xml',
         "views/hr_expense_view.xml",
         "workflow/hr_expense_workflow.xml",
+        'views/invoice_view.xml',
+        # 'views/voucher_view.xml',
     ],
 }

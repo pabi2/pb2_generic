@@ -46,6 +46,7 @@ class VatReportParser(report_sxw.rml_parse):
                     ELSE voucher.number END as number,
                 p.name as partner_name,
                 p.vat as tax_id,
+                p.taxbranch as taxbranch,
                 avt.tax_id as tax
             FROM
                 account_voucher_tax as avt
@@ -61,9 +62,28 @@ class VatReportParser(report_sxw.rml_parse):
                 voucher.period_id = %s AND
                 avt.company_id =%s
             GROUP BY
-                voucher.state,avt.id,voucher.date,voucher.number,p.name,p.vat,avt.tax_id
+                voucher.state,avt.id,voucher.date,voucher.number,
+                p.name,p.vat,avt.tax_id,p.taxbranch
         """, (tax.id, base_code.id, tax_code.id, period.id, company.id))
         voucher_tax = self.cr.dictfetchall()
+#         expense_partner_list =\
+#             [d for d in voucher_tax if d['expense_partner_id']]
+#         none_expense_partner_list =\
+#             [d for d in voucher_tax if not d['expense_partner_id']]
+        for rec in voucher_tax:
+            inv_tax = self.pool.get('account.voucher.tax').\
+                browse(self.cr, self.uid, rec['id'])
+            if inv_tax.expense_partner_id:
+                rec['partner_name'] = inv_tax.expense_partner_id.name
+                rec['tax_id'] = inv_tax.expense_partner_id.vat
+                rec['taxbranch'] = inv_tax.expense_partner_id.taxbranch
+            else:
+                rec['partner_name'] = inv_tax.supplier_name
+                rec['tax_id'] = inv_tax.supplier_vat
+                rec['taxbranch'] = inv_tax.supplier_taxbranch
+            if inv_tax.invoice_number:
+                rec['number'] = inv_tax.invoice_number
+#         voucher_tax = expense_partner_list + none_expense_partner_list
         return voucher_tax
 
     def get_invoice_tax(self, record):
@@ -90,7 +110,9 @@ class VatReportParser(report_sxw.rml_parse):
                     THEN invoice.internal_number || ' (CANCELLED)'
                     ELSE invoice.internal_number END as number,
                 p.name as partner_name,
-                p.vat as tax_id
+                p.taxbranch as taxbranch,
+                p.vat as tax_id,
+                ait.expense_partner_id as expense_partner_id
             FROM
                 account_invoice_tax as ait
             LEFT JOIN account_invoice invoice ON
@@ -105,9 +127,29 @@ class VatReportParser(report_sxw.rml_parse):
                 invoice.period_id = %s AND
                 ait.company_id =%s
             GROUP BY
-                invoice.state,ait.id,invoice.date_invoice,invoice.internal_number,p.name,p.vat
+                invoice.state,ait.id,invoice.date_invoice,
+                invoice.internal_number,p.name,p.vat,p.taxbranch,
+                ait.expense_partner_id
         """, (base_code.id, tax_code.id, period.id, company.id))
         invoice_tax = self.cr.dictfetchall()
+#         expense_partner_list =\
+#             [d for d in invoice_tax if d['expense_partner_id']]
+#         none_expense_partner_list =\
+#             [d for d in invoice_tax if not d['expense_partner_id']]
+        for rec in invoice_tax:
+            inv_tax = self.pool.get('account.invoice.tax').\
+                browse(self.cr, self.uid, rec['id'])
+            if inv_tax.expense_partner_id:
+                rec['partner_name'] = inv_tax.expense_partner_id.name
+                rec['tax_id'] = inv_tax.expense_partner_id.vat
+                rec['taxbranch'] = inv_tax.expense_partner_id.taxbranch
+            else:
+                rec['partner_name'] = inv_tax.supplier_name
+                rec['tax_id'] = inv_tax.supplier_vat
+                rec['taxbranch'] = inv_tax.supplier_taxbranch
+            if inv_tax.invoice_number:
+                rec['number'] = inv_tax.invoice_number
+#         invoice_tax = expense_partner_list + none_expense_partner_list
         return invoice_tax
 
     def get_lines(self, record):
@@ -126,5 +168,3 @@ class VatReportAbstarct(osv.AbstractModel):
     _inherit = "report.abstract_report"
     _template = "l10n_th_vat_report.report_vat"
     _wrapped_report_class = VatReportParser
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

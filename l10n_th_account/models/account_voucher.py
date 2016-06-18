@@ -704,6 +704,14 @@ class account_voucher_tax(common_voucher, models.Model):
     factor_tax = fields.Float(
         string='Multipication factor Tax code',
         compute='_count_factor')
+    expense_partner_id = fields.Many2one(
+        'res.partner',
+        string='Supplier',
+    )
+    invoice_number = fields.Char(string='Document')
+    supplier_name = fields.Char('Supplier Name')
+    supplier_vat = fields.Char('Tax ID')
+    supplier_taxbranch = fields.Char('Branch No.')
 
     @api.model
     def _compute_one_tax_grouped(self, taxes, voucher, voucher_cur,
@@ -712,12 +720,17 @@ class account_voucher_tax(common_voucher, models.Model):
                                  line, revised_price):
         tax_gp = {}
         tax_obj = self.env['account.tax']
-
         for tax in taxes:
             # For Normal
             val = {}
             val['voucher_id'] = voucher.id
             val['invoice_id'] = invoice.id
+            val['invoice_number'] = line.invoice_number
+            val['supplier_name'] = line.supplier_name
+            val['supplier_vat'] = line.supplier_vat
+            val['supplier_taxbranch'] = line.supplier_taxbranch
+            val['expense_partner_id'] = line.expense_partner_id and \
+                line.expense_partner_id.id or False
             val['tax_id'] = tax['id']
             val['name'] = tax['name']
             val['amount'] = self._to_voucher_currency(
@@ -736,6 +749,12 @@ class account_voucher_tax(common_voucher, models.Model):
             vals = {}
             vals['voucher_id'] = voucher.id
             vals['invoice_id'] = invoice.id
+            vals['invoice_number'] = line.invoice_number
+            vals['supplier_name'] = line.supplier_name
+            vals['supplier_vat'] = line.supplier_vat
+            vals['supplier_taxbranch'] = line.supplier_taxbranch
+            vals['expense_partner_id'] = line.expense_partner_id and \
+                line.expense_partner_id.id or False
             vals['tax_id'] = tax['id']
             vals['name'] = tax['name']
             vals['amount'] = self._to_invoice_currency(
@@ -808,7 +827,8 @@ class account_voucher_tax(common_voucher, models.Model):
                     val['account_analytic_id'] = line.account_analytic_id.id
 
                 key = (val['invoice_id'], val['tax_code_id'],
-                       val['base_code_id'], val['account_id'])
+                       val['base_code_id'], val['account_id'],
+                       val['invoice_number'], val['expense_partner_id'])
                 if not (key in tax_gp):
                     tax_gp[key] = val
                     tax_gp[key]['amount'] = tax_gp[key]['amount']
@@ -871,7 +891,8 @@ class account_voucher_tax(common_voucher, models.Model):
                     val['account_analytic_id'] = line.account_analytic_id.id
 
                 key = (val['invoice_id'], val['tax_code_id'],
-                       val['base_code_id'], val['account_id'])
+                       val['base_code_id'], val['account_id'],
+                       val['invoice_number'], val['expense_partner_id'])
                 if not (key in tax_gp):
                     tax_gp[key] = val
                 else:
@@ -924,7 +945,8 @@ class account_voucher_tax(common_voucher, models.Model):
                     vals['account_analytic_id'] = line.account_analytic_id.id
 
                 key = (vals['invoice_id'], vals['tax_code_id'],
-                       vals['base_code_id'], vals['account_id'])
+                       vals['base_code_id'], vals['account_id'],
+                       vals['invoice_number'], val['expense_partner_id'])
 
                 if not (key in tax_gp):
                     tax_gp[key] = vals
@@ -976,7 +998,6 @@ class account_voucher_tax(common_voucher, models.Model):
                     tax_gps[key]['base_amount'] += tax_gp[key]['base_amount']
                     tax_gps[key]['amount'] += tax_gp[key]['amount']
                     tax_gps[key]['base'] += tax_gp[key]['base']
-
         return tax_gps
 
     @api.model
@@ -1015,7 +1036,6 @@ class account_voucher_tax(common_voucher, models.Model):
             t['base_amount'] = voucher_cur.round(t['base_amount'])
             t['tax_amount'] = voucher_cur.round(t['tax_amount'])
             t['tax_currency_gain'] = voucher_cur.round(t['tax_currency_gain'])
-
         return tax_gps
 
     @api.model

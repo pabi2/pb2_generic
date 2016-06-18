@@ -3,23 +3,35 @@
 <openerp>
 <data>
 
-	<record id="view_expenses_form" model="ir.ui.view">
-	    <field name="name">view.expenses.form</field>
-	    <field name="model">hr.expense.expense</field>
-	    <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
-	    <field name="arch" type="xml">
-	    	<button name="draft" position="replace" />
-	    	<button name="done" position="replace" >
-	    		<button name="%(action_expense_create_supplier_invoice)d" states="accepted" string="Create Supplier Invoice" type="action"
-	    			groups="account.group_account_invoice" class="oe_highlight"/>
-	    	</button>
-			<field name="name" position="after">
-				<field name="pay_to" />
-				<field name="partner_id" attrs="{'invisible': [('pay_to', '!=', 'supplier')],
-												'required': [('pay_to', '=', 'supplier')]}"/> 
-	    	</field>
+    <record id="view_expenses_form" model="ir.ui.view">
+        <field name="name">view.expenses.form</field>
+        <field name="model">hr.expense.expense</field>
+        <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
+        <field name="arch" type="xml">
+            <button name="draft" position="replace" />
+            <button name="done" position="replace" >
+                <button name="%(action_expense_create_supplier_invoice)d" states="accepted" string="Create Supplier Invoice" type="action"
+                        groups="account.group_account_invoice" class="oe_highlight"/>
+            </button>
+            <field name="name" position="after">
+                <field name="pay_to" />
+                <field name="partner_id" attrs="{'invisible': [('pay_to', '!=', 'supplier')],
+                                                'required': [('pay_to', '=', 'supplier')]}"/> 
+            </field>
             <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
+            </xpath>
+            <xpath expr='/form/sheet/notebook/page/field/tree/field[@name="total_amount"]' position="after">
+                <field name="pay_to" invisible="1"/>
+                <button name="%(action_expense_line_tax_info)d"
+                        type="action"
+                        string="Add Vat Info"
+                        icon="gtk-ok"
+                        attrs="{'invisible': [('pay_to', '!=', 'employee')]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_view_move']" position="attributes">
+                <attribute name="states"></attribute>
+                <attribute name="attrs">{'invisible': ['|',('account_move_id', '=', False), ('state', 'not in', ('done', 'paid'))]}</attribute>
             </xpath>
             <xpath expr='/form/sheet/notebook/page/field/form/group//field[@name="date_value"]' position="before">
                 <field name="tax_ids" widget="many2many_tags" />
@@ -28,8 +40,45 @@
                 <field name="invoice_id" />
                 <field name="date_invoice" />
             </xpath>
-	    </field>
-	</record>
+            <xpath expr="//page[1]" position="after">
+                <page string="VAT Info" >
+                    <field name="vat_expense_line_ids">
+                        <tree string="Vat Info" editable="bottom" create="false" delete="false">
+                            <field name="date_invoice"/> 
+                            <field name="invoice_number"/>
+                            <field name="supplier_name" string="Supplier Text"/> 
+                            <field name="expense_partner_id" domain="[('supplier', '=', True)]" string="Supplier ID"/>
+                            <field name="supplier_vat"/>
+                            <field name="supplier_taxbranch"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+        <record id="view_expenses_form_editable_list" model="ir.ui.view">
+            <field name="name">hr.expense.form.editable.list</field>
+            <field name="model">hr.expense.expense</field>
+            <field name="inherit_id" ref="hr_expense.view_expenses_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='line_ids']/form/group" position="inside">
+                
+                	<group string="VAT Info">
+                	
+                		<field name="date_invoice"/> 
+                        <field name="invoice_number"/>
+                        <field name="supplier_name" string="Supplier Text"/> 
+                        <field name="expense_partner_id" domain="[('supplier', '=', True)]" string="Supplier ID"/>
+                        <field name="supplier_vat"/>
+                        <field name="supplier_taxbranch"/>
+
+                    </group>   
+                                 
+                </xpath>
+            </field>
+        </record>
 
 </data>
 </openerp>

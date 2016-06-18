@@ -45,11 +45,27 @@ class HRExpenseExpese(models.Model):
         readonly=True,
         copy=False,
         ondelete='set null',
+        compute='_compute_general_entries',
+        store=True,
     )
+    vat_expense_line_ids = fields.One2many(
+        'hr.expense.line',
+        'expense_id',
+        string="Vat Info",
+        readonly=True,
+        states={'draft': [('readonly', False)]},
+        copy=False,
+    )
+
+    @api.depends('invoice_id', 'invoice_id.state', 'invoice_id.move_id')
+    def _compute_general_entries(self):
+        for expense in self:
+            if expense.invoice_id and expense.invoice_id.move_id:
+                expense.account_move_id = expense.invoice_id.move_id
 
     @api.model
     def _prepare_inv_line(self, account_id, exp_line):
-        return {
+        line_vals = {
             'name': exp_line.name,
             'account_id': account_id,
             'price_unit': exp_line.unit_amount or 0.0,
@@ -57,6 +73,16 @@ class HRExpenseExpese(models.Model):
             'product_id': exp_line.product_id.id or False,
             'invoice_line_tax_id': [(6, 0, [x.id for x in exp_line.tax_ids])],
         }
+        if exp_line.pay_to == 'employee':
+            line_vals.update(
+                invoice_number=exp_line.invoice_number,
+                supplier_name=exp_line.supplier_name,
+                supplier_vat=exp_line.supplier_vat,
+                supplier_taxbranch=exp_line.supplier_taxbranch,
+                date_invoice=exp_line.date_invoice,
+                expense_partner_id=exp_line.expense_partner_id.id,
+            )
+        return line_vals
 
     @api.model
     def _prepare_inv(self, expense):
@@ -104,6 +130,7 @@ class HRExpenseExpese(models.Model):
             'company_id': expense.company_id.id,
             'currency_id': expense.currency_id.id,
             'journal_id': journal_id,
+            'pay_to': expense.pay_to,
         }
 
     @api.model
@@ -135,13 +162,17 @@ class HRExpenseExpese(models.Model):
         InvoiceLine = self.env['account.invoice.line']
         expense = self
         invoice_vals = expense._prepare_inv(expense)
+        line_total = 0.0
         for exp_line in expense.line_ids:
             account_id = self._choose_account_from_exp_line(
                 exp_line, invoice_vals['fiscal_position'])
+            line_total += exp_line.total_amount
             inv_line_data = self._prepare_inv_line(account_id, exp_line)
             inv_line = InvoiceLine.create(inv_line_data)
             inv_lines.append(inv_line.id)
             exp_line.write({'invoice_line_ids': [(4, inv_line.id)]})
+        if line_total != expense.amount:
+            raise UserError(_('Expense amount is mismatched.'))
         invoice_vals.update({'invoice_line': [(6, 0, inv_lines)]})
         # Create Invoice
         invoice = Invoice.create(invoice_vals)
@@ -157,15 +188,38 @@ class HRExpenseExpese(models.Model):
             if not expense.invoice_id:
                 invoice = expense._create_supplier_invoice_from_expense()
                 expense.invoice_id = invoice
-                # invoice.signal_workflow('invoice_open')
-            expense.write({'account_move_id': expense.invoice_id.move_id.id,
-                           'state': 'done'})
+            expense.write({'state': 'done'})
         return True
 
 
 class HRExpenseLine(models.Model):
     _inherit = "hr.expense.line"
 
+    date_invoice = fields.Date(
+        string='Date',
+        copy=False,
+    )
+    invoice_number = fields.Char(
+        string='Number',
+        copy=False,
+    )
+    supplier_name = fields.Char(
+        string='Supplier',
+        copy=False,
+    )
+    supplier_vat = fields.Char(
+        string='Tax ID',
+        copy=False,
+    )
+    supplier_taxbranch = fields.Char(
+        string='Branch No.',
+        copy=False,
+    )
+    expense_partner_id = fields.Many2one(
+        'res.partner',
+        string='Supplier',
+        copy=False,
+    )
     expense_state = fields.Selection(
         [('draft', 'New'),
          ('cancelled', 'Refused'),
@@ -177,6 +231,14 @@ class HRExpenseLine(models.Model):
         string='Expense state',
         readonly=True,
         related='expense_id.state',
+        store=True,
+    )
+    pay_to = fields.Selection(
+        [('employee', 'Employee'),
+         ('supplier', 'Supplier')],
+        string='Pay to',
+        related='expense_id.pay_to',
+        readonly=True,
         store=True,
     )
     tax_ids = fields.Many2many(

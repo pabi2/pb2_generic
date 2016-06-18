@@ -6,7 +6,7 @@
     'author': "Ecosoft,Odoo Community Association (OCA)",
     'website': "http://ecosoft.co.th",
     'category': 'Account',
-    'version': '0.1.0',
+    'version': '8.0.1.0.0',
     'depends': [
         'account',
         'account_voucher',

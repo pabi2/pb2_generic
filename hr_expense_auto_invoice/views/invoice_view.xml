@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<openerp>
+    <data>
+        <record id="invoice_supplier_form" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='supplier_invoice_number']" position="after">
+                    <field name="pay_to"/>
+                </xpath>
+                <xpath expr="//form/sheet/notebook/page[3]" position="after">
+                    <page string="Vat Info" attrs="{'invisible': [('pay_to', '!=', 'employee')]}">
+                        <field name="tax_invoice_line">
+                            <tree string="VAT Info" editable="bottom" create="false" delete="false">
+                                <field name="date_invoice"/>
+                                <field name="invoice_number"/>
+                                <field name="supplier_name"/>
+                                <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
+                                <field name="supplier_vat"/>
+                                <field name="supplier_taxbranch"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                <xpath expr="//form/sheet/notebook/page[1]/div[1]/field/tree/field[@name='account_analytic_id']" position="after">
+                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/> 
+                    <field name="supplier_name"/>
+                    <field name="invoice_number"/>
+                </xpath>
+            </field>
+        </record>
+        
+
+        <record id="view_invoice_line_form" model="ir.ui.view">
+            <field name="name">account.invoice.line.form</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group" position="inside">
+                	
+                    <group string="VAT Info" >
+        
+	                 	<field name="date_invoice"/>
+	                    <field name="invoice_number"/>
+	                    <field name="supplier_name"/>
+	                    <field name="expense_partner_id" domain="[('supplier', '=', True)]"/>
+	                    <field name="supplier_vat"/>
+	                    <field name="supplier_taxbranch"/>
+	                    
+                    </group>
+                    
+                </xpath>
+            </field>
+        </record>
+        
+        
+    </data>
+</openerp>
